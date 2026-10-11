@@ -11,7 +11,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: firebase-dr-youssef-tafnouti
+  group: firebase-docteur-youssef-tafnouti
   cancel-in-progress: false
 jobs:
   deploy:
@@ -21,15 +21,15 @@ jobs:
       - uses: actions/checkout@v4
       - name: Verify the only authorized Firebase target
         run: |
-          node -e "const fs=require('fs');const rc=JSON.parse(fs.readFileSync('.firebaserc'));const cfg=JSON.parse(fs.readFileSync('firebase.json'));if(rc.projects.default!=='dr-youssef-tafnouti'||cfg.hosting.length!==1||cfg.hosting[0].site!=='dr-youssef-tafnouti'||cfg.hosting[0].public!=='public')throw Error('Unexpected Firebase deployment target');for(const p of ['public/index.html','public/rendez-vous.html'])if(!fs.existsSync(p))throw Error('Missing page: '+p);"
+          node -e "const fs=require('fs');const rc=JSON.parse(fs.readFileSync('.firebaserc'));const cfg=JSON.parse(fs.readFileSync('firebase.json'));if(rc.projects.default!=='docteur-youssef-tafnouti'||cfg.hosting.length!==1||cfg.hosting[0].site!=='docteur-youssef-tafnouti'||cfg.hosting[0].public!=='public')throw Error('Unexpected Firebase deployment target');for(const p of ['public/index.html','public/rendez-vous.html'])if(!fs.existsSync(p))throw Error('Missing page: '+p);"
       - name: Check Firebase deployment credential
         env:
-          FIREBASE_CREDENTIAL: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_DR_YOUSSEF_TAFNOUTI }}
+          FIREBASE_CREDENTIAL: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_DOCTEUR_YOUSSEF_TAFNOUTI }}
         run: |
-          node -e "const c=process.env.FIREBASE_CREDENTIAL;if(!c)throw Error('Add the repository secret FIREBASE_SERVICE_ACCOUNT_DR_YOUSSEF_TAFNOUTI');if(JSON.parse(c).project_id!=='dr-youssef-tafnouti')throw Error('Credential belongs to another Firebase project');"
+          node -e "const c=process.env.FIREBASE_CREDENTIAL;if(!c)throw Error('Add the repository secret FIREBASE_SERVICE_ACCOUNT_DOCTEUR_YOUSSEF_TAFNOUTI');if(JSON.parse(c).project_id!=='docteur-youssef-tafnouti')throw Error('Credential belongs to another Firebase project');"
       - name: Deploy Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_DR_YOUSSEF_TAFNOUTI }}
-          projectId: dr-youssef-tafnouti
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_DOCTEUR_YOUSSEF_TAFNOUTI }}
+          projectId: docteur-youssef-tafnouti
           channelId: live
