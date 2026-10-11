@@ -1,7 +1,7 @@
 {
   "hosting": [
     {
-      "site": "dr-youssef-tafnouti",
+      "site": "docteur-youssef-tafnouti",
       "public": "public",
       "ignore": [
         "firebase.json",
