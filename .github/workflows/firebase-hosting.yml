@@ -3,6 +3,7 @@ on:
   push:
     branches: [main]
     paths:
+      - 'scripts/**'
       - 'src/**'
       - 'public/**'
       - 'package.json'
@@ -28,6 +29,13 @@ jobs:
       - uses: oven-sh/setup-bun@v2
       - name: Install dependencies
         run: bun install --frozen-lockfile
+      - name: Generate branded Youssef app icons and WhatsApp share image
+        run: |
+          python -m pip install --break-system-packages cairosvg Pillow
+          python scripts/create-brand-assets.py
+          test -s public/favicon.ico
+          test -s public/og-youssef-tafnouti.png
+          test -s public/apple-touch-icon.png
       - name: Build Lovable website (static prerender)
         run: bun run build
       - name: Verify built static site
