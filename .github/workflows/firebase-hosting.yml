@@ -2,6 +2,8 @@ name: Build and deploy Dr Youssef Tafnaouti
 on:
   pull_request:
     branches: [main]
+  push:
+    branches: [main]
   workflow_dispatch:
 permissions:
   contents: read
@@ -33,8 +35,8 @@ jobs:
           const h=Array.isArray(cfg.hosting)?cfg.hosting[0]:cfg.hosting;
           if(rc.projects.default!=='docteur-youssef-tafnouti'||h.site!=='docteur-youssef-tafnouti'||h.public!=='.output/public') throw Error('Unexpected Firebase deployment target');
           NODE
-      - name: Deploy to Firebase only on manual main run
-        if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+      - name: Deploy Firebase on validated main push or manual run
+        if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_DOCTEUR_YOUSSEF_TAFNOUTI }}
