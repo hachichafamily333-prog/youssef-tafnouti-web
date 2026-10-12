@@ -35,9 +35,15 @@ export const Route = createFileRoute("/")({
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { property: "og:url", content: "/" },
+      { property: "og:image", content: "https://docteur-youssef-tafnouti.web.app/og-youssef-tafnouti.png?v=2" },
+      { property: "og:image:secure_url", content: "https://docteur-youssef-tafnouti.web.app/og-youssef-tafnouti.png?v=2" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { property: "og:image:alt", content: "Dr Youssef Tafnouti — Cabinet dentaire à Ariana" },
+      { name: "twitter:image", content: "https://docteur-youssef-tafnouti.web.app/og-youssef-tafnouti.png?v=2" },
+      { property: "og:url", content: "https://docteur-youssef-tafnouti.web.app/" },
     ],
-    links: [{ rel: "canonical", href: "/" }],
+    links: [{ rel: "canonical", href: "https://docteur-youssef-tafnouti.web.app/" }],
     scripts: [
       {
         type: "application/ld+json",
