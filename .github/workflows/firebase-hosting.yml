@@ -1,5 +1,16 @@
 name: Build and deploy Dr Youssef Tafnaouti
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'package.json'
+      - 'bun.lock'
+      - 'vite.config.ts'
+      - 'firebase.json'
+      - '.firebaserc'
+      - '.github/workflows/firebase-hosting.yml'
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -33,8 +44,8 @@ jobs:
           const h=Array.isArray(cfg.hosting)?cfg.hosting[0]:cfg.hosting;
           if(rc.projects.default!=='docteur-youssef-tafnouti'||h.site!=='docteur-youssef-tafnouti'||h.public!=='.output/public') throw Error('Unexpected Firebase deployment target');
           NODE
-      - name: Deploy to Firebase only on manual main run
-        if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+      - name: Deploy to Firebase after validated main build
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_DOCTEUR_YOUSSEF_TAFNOUTI }}
