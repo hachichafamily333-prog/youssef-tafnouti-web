@@ -1,12 +1,7 @@
-name: Deploy Youssef Tafnouti to Firebase
+name: Build and deploy Dr Youssef Tafnaouti
 on:
-  push:
+  pull_request:
     branches: [main]
-    paths:
-      - 'public/**'
-      - 'firebase.json'
-      - '.firebaserc'
-      - '.github/workflows/firebase-hosting.yml'
   workflow_dispatch:
 permissions:
   contents: read
@@ -14,22 +9,35 @@ concurrency:
   group: firebase-docteur-youssef-tafnouti
   cancel-in-progress: false
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-      - name: Verify the only authorized Firebase target
+      - uses: oven-sh/setup-bun@v2
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Build Lovable website (static prerender)
+        run: bun run build
+      - name: Verify built static site
         run: |
-          node -e "const fs=require('fs');const rc=JSON.parse(fs.readFileSync('.firebaserc'));const cfg=JSON.parse(fs.readFileSync('firebase.json'));if(rc.projects.default!=='docteur-youssef-tafnouti'||cfg.hosting.length!==1||cfg.hosting[0].site!=='docteur-youssef-tafnouti'||cfg.hosting[0].public!=='public')throw Error('Unexpected Firebase deployment target');for(const p of ['public/index.html','public/rendez-vous.html'])if(!fs.existsSync(p))throw Error('Missing page: '+p);"
-      - name: Check Firebase deployment credential
-        env:
-          FIREBASE_CREDENTIAL: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_DOCTEUR_YOUSSEF_TAFNOUTI }}
+          test -f .output/public/index.html
+          test -d .output/public
+          test -n "$(find .output/public -type f -name '*.js' -print -quit)"
+      - name: Check authorized Firebase target
         run: |
-          node -e "const c=process.env.FIREBASE_CREDENTIAL;if(!c)throw Error('Add the repository secret FIREBASE_SERVICE_ACCOUNT_DOCTEUR_YOUSSEF_TAFNOUTI');if(JSON.parse(c).project_id!=='docteur-youssef-tafnouti')throw Error('Credential belongs to another Firebase project');"
-      - name: Deploy Hosting
+          node - <<'NODE'
+          const fs=require('fs');
+          const rc=JSON.parse(fs.readFileSync('.firebaserc'));
+          const cfg=JSON.parse(fs.readFileSync('firebase.json'));
+          const h=Array.isArray(cfg.hosting)?cfg.hosting[0]:cfg.hosting;
+          if(rc.projects.default!=='docteur-youssef-tafnouti'||h.site!=='docteur-youssef-tafnouti'||h.public!=='.output/public') throw Error('Unexpected Firebase deployment target');
+          NODE
+      - name: Deploy to Firebase only on manual main run
+        if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_DOCTEUR_YOUSSEF_TAFNOUTI }}
           projectId: docteur-youssef-tafnouti
+          target: live
           channelId: live
